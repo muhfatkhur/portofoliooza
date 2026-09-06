@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Rozaq — Software Engineer",
+  title: "Muh.fatkhur - portfolio",
   description:
     "Portfolio Muh. Fatkhur Rozaq Nur Abin — Software Engineer spesialis web & mobile, REST API, dan sistem analitik.",
 };

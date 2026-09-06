@@ -1063,7 +1063,7 @@ export default function WorkshopRecommendationPage() {
               <span className="grid size-8 place-items-center bg-[var(--fg)] font-mono text-[0.65rem] text-[var(--bg)]">
                 OZA
               </span>
-              <span className="hidden sm:inline">Muh. Fatkhur Rozaq</span>
+              <span className="hidden sm:inline">Muh. Fatkhur Rozaq Nur Abin</span>
             </Link>
 
             <div className="hidden items-center gap-7 lg:flex">
