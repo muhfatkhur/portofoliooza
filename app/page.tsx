@@ -390,6 +390,8 @@ const navItems = [
 const focusRing =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--bg)]";
 
+const PROFILE_FRAME_ASPECT_RATIO = 4 / 5;
+
 function Reveal({
   children,
   className = "",
@@ -584,7 +586,6 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
   const [dragOffset, setDragOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [failedSources, setFailedSources] = useState<Record<string, boolean>>({});
-  const [aspectRatios, setAspectRatios] = useState<Record<string, number>>({});
 
   const hasMultiple = screenshots.length > 1;
   const goTo = (index: number) => {
@@ -617,10 +618,6 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
 
   if (!screenshots.length) return null;
 
-  const activeScreenshot = screenshots[current];
-  const activeAspectRatio =
-    activeScreenshot.aspectRatio ?? aspectRatios[activeScreenshot.src] ?? 16 / 9;
-
   return (
     <div className="flex w-full flex-col">
       <div
@@ -652,7 +649,7 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
         style={{
           touchAction: "pan-y",
           cursor: dragStart === null ? "grab" : "grabbing",
-          aspectRatio: activeAspectRatio,
+          aspectRatio: PROFILE_FRAME_ASPECT_RATIO,
         }}
       >
         <div
@@ -667,38 +664,32 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
               key={`${screenshot.src}-${index}`}
               className="profile-frame relative h-full w-full shrink-0"
               aria-hidden={index !== current}
-              style={{ aspectRatio: activeAspectRatio }}
+              style={{ aspectRatio: PROFILE_FRAME_ASPECT_RATIO }}
             >
-              {failedSources[screenshot.src] ? (
-                <div className="grid size-full place-items-center bg-[var(--surface)] p-6 text-center text-xs leading-5 text-[var(--muted)]">
-                  Foto profil belum tersedia.
-                  <br />
-                  <code className="mt-1 break-all text-[var(--accent)]">public{screenshot.src}</code>
-                </div>
-              ) : (
-                <Image
-                  src={screenshot.src}
-                  alt={screenshot.alt}
-                  fill
-                  sizes="24rem"
-                  priority={index === 0}
-                  className="pointer-events-none select-none object-contain object-center"
-                  onLoad={(event) => {
-                    const image = event.currentTarget;
-                    if (!image.naturalWidth || !image.naturalHeight) return;
-                    setAspectRatios((currentRatios) => ({
-                      ...currentRatios,
-                      [screenshot.src]: image.naturalWidth / image.naturalHeight,
-                    }));
-                  }}
-                  onError={() =>
-                    setFailedSources((currentSources) => ({
-                      ...currentSources,
-                      [screenshot.src]: true,
-                    }))
-                  }
-                />
-              )}
+              <div className="profile-photo-frame relative size-full overflow-hidden">
+                {failedSources[screenshot.src] ? (
+                  <div className="grid size-full place-items-center bg-[var(--surface)] p-6 text-center text-xs leading-5 text-[var(--muted)]">
+                    Foto profil belum tersedia.
+                    <br />
+                    <code className="mt-1 break-all text-[var(--accent)]">public{screenshot.src}</code>
+                  </div>
+                ) : (
+                  <Image
+                    src={screenshot.src}
+                    alt={screenshot.alt}
+                    fill
+                    sizes="24rem"
+                    priority={index === 0}
+                    className="pointer-events-none select-none object-contain object-center"
+                    onError={() =>
+                      setFailedSources((currentSources) => ({
+                        ...currentSources,
+                        [screenshot.src]: true,
+                      }))
+                    }
+                  />
+                )}
+              </div>
             </figure>
           ))}
         </div>
@@ -1179,7 +1170,10 @@ function ProjectIndex({
           <span className="mt-2 block max-w-2xl text-base leading-7 text-[var(--muted)]">{project.shortDescription}</span>
           <span className="mt-4 block"><Tags items={project.technologies} /></span>
         </span>
-        <ArrowUpRight aria-hidden="true" className="size-5 text-[var(--accent)] transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
+        <span className="flex items-center gap-2 whitespace-nowrap pt-1 font-mono text-[0.6rem] tracking-[0.12em] text-[var(--muted)] transition-colors group-hover:text-[var(--accent)]">
+          click for detail
+          <ArrowUpRight aria-hidden="true" className="size-5 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
+        </span>
       </Link>
 
       <div className="lg:hidden">
@@ -1197,7 +1191,10 @@ function ProjectIndex({
               <span className="mt-4 block"><InlineTags items={project.technologies} /></span>
             </span>
           </span>
-          <ArrowUpRight aria-hidden="true" className="mt-1 size-5 shrink-0 text-[var(--accent)] transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+          <span className="mt-1 flex shrink-0 items-center gap-2 whitespace-nowrap font-mono text-[0.55rem] tracking-[0.1em] text-[var(--muted)] transition-colors group-hover:text-[var(--accent)]">
+            click for detail
+            <ArrowUpRight aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+          </span>
         </Link>
         <div className="pb-8 pt-2 sm:px-5">
           <ProjectOverview project={project} />
@@ -1465,7 +1462,7 @@ export default function PortfolioPage() {
       <meta property="og:title" content="Muh. Fatkhur Rozaq Nur Abin — Software Developer" />
       <meta
         property="og:description"
-        content="Informatics graduate and software developer focused on practical web and mobile systems."
+        content="software developer focused on practical web and mobile systems."
       />
       <meta property="og:type" content="website" />
       <meta name="twitter:card" content="summary" />
@@ -2494,6 +2491,18 @@ export default function PortfolioPage() {
           border: 1px solid var(--line);
           background: linear-gradient(145deg, var(--surface), color-mix(in srgb, var(--surface) 72%, var(--accent) 28%));
           box-shadow: 0 25px 70px color-mix(in srgb, var(--accent) 10%, transparent);
+          aspect-ratio: 4 / 5;
+        }
+
+        .profile-frame {
+          box-sizing: border-box;
+          padding: clamp(0.75rem, 2.6vw, 1.25rem);
+        }
+
+        .profile-photo-frame {
+          border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--line));
+          background: var(--bg);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 72%, transparent), 0 12px 28px color-mix(in srgb, var(--accent) 10%, transparent);
         }
 
         .theme-button {
@@ -3191,7 +3200,7 @@ export default function PortfolioPage() {
                     <span className="hero-title-line hero-title-line-two hero-title-accent">Rozaq Nur Abin</span>
                   </h1>
                   <p className="hero-copy mt-8 max-w-2xl text-lg leading-8 text-[var(--muted)] sm:text-xl sm:leading-9">
-                    <TextReveal text="Informatics graduate focused on practical web and mobile systems—working with Laravel, Flutter, REST APIs, location technology, data processing, and forecasting." />
+                    <TextReveal text=" focused on practical web and mobile systems working with Laravel, Flutter, REST APIs, location technology, data processing, and forecasting." />
                   </p>
                   <div className="hero-actions mt-9 flex flex-wrap gap-3">
                     <a
@@ -3277,22 +3286,23 @@ export default function PortfolioPage() {
                 eyebrow="About"
               />
 
-              <div className="mt-14 grid gap-12 lg:grid-cols-[9rem_minmax(0,1.35fr)_minmax(17rem,0.65fr)] lg:gap-10">
+                <div className="mt-14 grid gap-12 lg:grid-cols-[9rem_minmax(0,1.35fr)_minmax(17rem,0.65fr)] lg:gap-10">
                 <p className="font-mono text-xs tracking-[0.12em] text-[var(--muted)]">
                   PROFILE / 2026
                 </p>
                 <div className="max-w-3xl space-y-6 text-xl leading-9 tracking-[-0.015em] text-[var(--fg)] sm:text-2xl sm:leading-10">
                   <p>
-                    Lulusan S1 Teknik Informatika Universitas Muhammadiyah Surakarta yang
-                    menyelesaikan studi dalam waktu 3,5 tahun. Memiliki kompetensi dalam
-                    pengembangan sistem berbasis web dan aplikasi mobile menggunakan Laravel
+                    Lulusan S1 Teknik Informatika Universitas Muhammadiyah Surakarta dengan keahlian <em>full-stack</em> menggunakan Laravel
                     dan Flutter.
                   </p>
                   <p className="text-[var(--muted)]">
-                    Berpengalaman dalam manajemen tim, penyelesaian konflik, serta koordinasi
-                    lintas divisi melalui keterlibatan aktif dalam organisasi. Kemampuan
-                    tersebut mendukung komunikasi yang efektif, kolaborasi yang baik, serta
-                    penyelesaian proyek pengembangan perangkat lunak secara efisien.
+                    Berpengalaman merancang dan mengembangkan berbagai aplikasi kompleks secara
+                    <em> end-to-end</em>, mencakup platform manajemen akademik, sistem presensi
+                    berbasis pemetaan lokasi (<em>geofencing</em>), hingga implementasi algoritma
+                    (K-Means &amp; AHP) untuk sistem rekomendasi. Didukung oleh 2 tahun pengalaman
+                    di organisasi mahasiswa yang mengasah kepemimpinan, resolusi konflik, dan
+                    kolaborasi lintas divisi yang efisien dalam siklus pengembangan perangkat
+                    lunak.
                   </p>
                 </div>
                 <dl className="border-t border-[var(--line)]">

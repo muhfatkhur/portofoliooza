@@ -1341,26 +1341,14 @@ export default function WorkshopRecommendationPage() {
             <div className="mx-auto max-w-[88rem] px-5 py-20 sm:px-8 sm:py-24 lg:px-12 lg:py-32">
               <Reveal>
                 <div className="grid gap-12 lg:grid-cols-[9rem_1fr] lg:gap-10">
-                <p className="font-mono text-xs tracking-[0.14em] opacity-60">NEXT / CASE 03</p>
+                <p className="font-mono text-xs tracking-[0.14em] opacity-60"></p>
                 <div>
                   <p className="font-mono text-xs tracking-[0.13em] opacity-60">
-                    POINT OF SALE / BUSINESS INTELLIGENCE
+
                   </p>
                   <h2 className="mt-5 max-w-5xl text-balance text-4xl font-medium leading-[1.04] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
-                    Sistem Point of Sale & Inventaris Warung
                   </h2>
                   <div className="mt-10 flex flex-wrap gap-3">
-                    <Link
-                      href="/projects/pos-sales-forecasting"
-                      onClick={(event) => handleNavigation(event, "/projects/pos-sales-forecasting", "NEXT CASE STUDY")}
-                      className={`${focusRing} group inline-flex min-h-12 items-center gap-3 bg-[var(--accent)] px-5 text-sm font-semibold text-[var(--accent-contrast)]`}
-                    >
-                      Next project
-                      <ArrowRight
-                        aria-hidden="true"
-                        className="size-4 transition-transform group-hover:translate-x-1"
-                      />
-                    </Link>
                     <Link
                       href="/#projects"
                       onClick={(event) => handleNavigation(event, "/#projects", "OPEN PROJECT INDEX")}

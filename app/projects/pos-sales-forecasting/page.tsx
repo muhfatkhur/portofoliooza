@@ -1300,12 +1300,12 @@ export default function WorkshopRecommendationPage() {
                     FULL-STACK WEB APPLICATION
                   </p>
                   <h2 className="mt-5 max-w-5xl text-balance text-4xl font-medium leading-[1.04] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
-                    Sistem Informasi Presensi Cerdas Berbasis Geofencing
+                    SIAKAD MA'HAD AL JAMI'AH
                   </h2>
                   <div className="mt-10 flex flex-wrap gap-3">
                     <Link
-                      href="/projects/geofencing"
-                      onClick={(event) => handleNavigation(event, "/projects/geofencing", "NEXT CASE STUDY")}
+                      href="/projects/siakad-mahad"
+                      onClick={(event) => handleNavigation(event, "/projects/siakad-mahad", "NEXT CASE STUDY")}
                       className={`${focusRing} group inline-flex min-h-12 items-center gap-3 bg-[var(--accent)] px-5 text-sm font-semibold text-[var(--accent-contrast)]`}
                     >
                       Next project
