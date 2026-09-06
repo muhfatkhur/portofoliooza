@@ -24,6 +24,7 @@ import {
   Menu,
   Moon,
   Network,
+  Phone,
   Scale,
   Sun,
   Users,
@@ -49,9 +50,6 @@ type Screenshot = {
   src: string;
   alt: string;
   caption?: string;
-  mediaType?: "image" | "video";
-  poster?: string;
-  aspectRatio?: number;
 };
 
 type Project = {
@@ -78,13 +76,9 @@ type Experience = {
   scope: string[];
 };
 
-const CV_FILE_NAMES = [
-  "Muh_Fatkhur_Rozaq_Nur_Abin_CV.pdf",
-  "cv.pdf",
-] as const;
-const CV_FILE_NAME = CV_FILE_NAMES[0];
-const CV_URL_CANDIDATES = CV_FILE_NAMES.map((fileName) => `/cv/${fileName}`);
-const CV_URL = CV_URL_CANDIDATES[0];
+const CV_FILE_NAME = "cv.pdf";
+const CV_URL = `/cv/${CV_FILE_NAME}`;
+const INTRO_STORAGE_KEY = "portfolio-intro-seen-v2";
 
 const profile = {
   name: "Muh. Fatkhur Rozaq Nur Abin",
@@ -95,15 +89,14 @@ const profile = {
       alt: "Profile photo of Muh. Fatkhur Rozaq Nur Abin",
     },
     {
-      src: "/images/profile/profile-02.jpeg",
-      alt: "Profile photo of Muh. Fatkhur Rozaq Nur Abin",
-    },
-    {
-      src: "/images/profile/profile-03.jpeg",
+      src: "/images/profile/profile-02.jpg",
       alt: "Profile photo of Muh. Fatkhur Rozaq Nur Abin",
     },
   ] as Screenshot[],
   email: "mfrnaoza@gmail.com",
+  phone: "0895414256031",
+  phoneInternational: "+62895414256031",
+  whatsappUrl: "https://wa.me/62895414256031",
   cvUrl: CV_URL,
   location: "  Magetan, Jawa Timur",
   socials: {
@@ -131,7 +124,7 @@ const projects: Project[] = [
     ],
     screenshots: [
       {
-        src: "/images/projects/geofencing/01.png",
+        src: "/images/projects/geofencing-attendance/01.png",
         alt: "Preview sistem presensi berbasis geofencing",
         caption: "Preview utama — screenshot 01",
       },
@@ -157,11 +150,9 @@ const projects: Project[] = [
     ],
     screenshots: [
       {
-        src: "/images/projects/workshop/0906.mp4",
-        mediaType: "video",
-        poster: "/images/projects/workshop/0906.jpg",
-        alt: "Demo video sistem informasi bengkel",
-        caption: "Demo singkat Company Profile, konsultasi pelanggan, dashboard admin, dan fitur analitik bengkel.",
+        src: "/images/projects/workshop/workshop-01.jpg",
+        alt: "Preview sistem rekomendasi bengkel",
+        caption: "Preview utama — screenshot 01",
       },
     ],
     githubUrl: "https://github.com/muhfatkhur/Compro-AHP-KMeans",
@@ -185,7 +176,7 @@ const projects: Project[] = [
     ],
     screenshots: [
       {
-        src: "/images/projects/kasir/dashboard.png",
+        src: "/images/projects/pos-sales-forecasting/01.png",
         alt: "Preview point of sales dengan forecasting",
         caption: "Preview utama — screenshot 01",
       },
@@ -218,7 +209,7 @@ const projects: Project[] = [
     ],
     screenshots: [
       {
-        src: "/images/projects/siakad-mahad/dadmin.png",
+        src: "/images/projects/siakad-mahad/01.png",
         alt: "Preview SIAKAD Ma'had Al-Jami'ah",
         caption: "Preview utama — screenshot 01",
       },
@@ -498,18 +489,20 @@ function TextReveal({
 function SectionHeading({
   number,
   eyebrow,
+  title,
 }: {
   number: string;
   eyebrow: string;
+  title: string;
 }) {
   return (
     <Reveal>
       <div className="section-heading grid gap-3 border-t border-[var(--line)] pt-5 md:grid-cols-[9rem_1fr] md:gap-8">
         <p className="font-mono text-xs tracking-[0.16em] text-[var(--muted)]">
-          {number} / SECTION
+          {number} / {eyebrow.toUpperCase()}
         </p>
         <h2 className="max-w-4xl text-balance text-3xl font-medium tracking-[-0.04em] text-[var(--fg)] sm:text-4xl lg:text-5xl">
-          <TextReveal text={eyebrow} />
+          <TextReveal text={title} />
         </h2>
       </div>
     </Reveal>
@@ -584,7 +577,6 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
   const [dragOffset, setDragOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [failedSources, setFailedSources] = useState<Record<string, boolean>>({});
-  const [aspectRatios, setAspectRatios] = useState<Record<string, number>>({});
 
   const hasMultiple = screenshots.length > 1;
   const goTo = (index: number) => {
@@ -617,14 +609,10 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
 
   if (!screenshots.length) return null;
 
-  const activeScreenshot = screenshots[current];
-  const activeAspectRatio =
-    activeScreenshot.aspectRatio ?? aspectRatios[activeScreenshot.src] ?? 16 / 9;
-
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <div
-        className="profile-carousel-shell group relative w-full overflow-hidden outline-none"
+        className="profile-carousel-shell group relative min-h-0 flex-1 overflow-hidden outline-none"
         role="region"
         aria-roledescription="carousel"
         aria-label={`${title} profile photos`}
@@ -649,14 +637,10 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
         onMouseLeave={() => setIsPaused(false)}
         onFocus={() => setIsPaused(true)}
         onBlur={() => setIsPaused(false)}
-        style={{
-          touchAction: "pan-y",
-          cursor: dragStart === null ? "grab" : "grabbing",
-          aspectRatio: activeAspectRatio,
-        }}
+        style={{ touchAction: "pan-y", cursor: dragStart === null ? "grab" : "grabbing" }}
       >
         <div
-          className="flex h-full w-full transition-transform duration-500 ease-out"
+          className="flex h-full transition-transform duration-500 ease-out"
           style={{
             transform: `translateX(calc(-${current * 100}% + ${dragOffset}px))`,
             transitionDuration: dragStart === null ? undefined : "0ms",
@@ -667,7 +651,6 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
               key={`${screenshot.src}-${index}`}
               className="profile-frame relative h-full w-full shrink-0"
               aria-hidden={index !== current}
-              style={{ aspectRatio: activeAspectRatio }}
             >
               {failedSources[screenshot.src] ? (
                 <div className="grid size-full place-items-center bg-[var(--surface)] p-6 text-center text-xs leading-5 text-[var(--muted)]">
@@ -682,15 +665,7 @@ function ProfileCarousel({ screenshots, title }: { screenshots: Screenshot[]; ti
                   fill
                   sizes="24rem"
                   priority={index === 0}
-                  className="pointer-events-none select-none object-contain object-center"
-                  onLoad={(event) => {
-                    const image = event.currentTarget;
-                    if (!image.naturalWidth || !image.naturalHeight) return;
-                    setAspectRatios((currentRatios) => ({
-                      ...currentRatios,
-                      [screenshot.src]: image.naturalWidth / image.naturalHeight,
-                    }));
-                  }}
+                  className="pointer-events-none select-none object-cover object-center sm:object-contain sm:object-top"
                   onError={() =>
                     setFailedSources((currentSources) => ({
                       ...currentSources,
@@ -850,48 +825,6 @@ function CvPreviewModal({ open, onClose }: { open: boolean; onClose: () => void 
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-  const [resolvedCvUrl, setResolvedCvUrl] = useState(CV_URL);
-  const [cvAvailable, setCvAvailable] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (!open) return;
-
-    let cancelled = false;
-    setResolvedCvUrl(CV_URL);
-    setCvAvailable(null);
-
-    const findCvFile = async () => {
-      for (const candidate of CV_URL_CANDIDATES) {
-        try {
-          let response = await fetch(candidate, {
-            method: "HEAD",
-            cache: "no-store",
-          });
-
-          if (response.status === 405 || response.status === 501) {
-            response = await fetch(candidate, { cache: "no-store" });
-          }
-
-          if (response.ok) {
-            if (!cancelled) {
-              setResolvedCvUrl(candidate);
-              setCvAvailable(true);
-            }
-            return;
-          }
-        } catch {
-          // Try the next supported filename.
-        }
-      }
-
-      if (!cancelled) setCvAvailable(false);
-    };
-
-    void findCvFile();
-    return () => {
-      cancelled = true;
-    };
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -973,30 +906,12 @@ function CvPreviewModal({ open, onClose }: { open: boolean; onClose: () => void 
           </button>
         </div>
 
-        <div className="cv-preview-frame" aria-live="polite">
-          {cvAvailable === false ? (
-            <div className="grid h-full min-h-[14rem] place-items-center p-6 text-center text-sm leading-6 text-slate-600">
-              <div>
-                <p className="font-semibold">File CV belum ditemukan.</p>
-                <p className="mt-2">
-                  Simpan PDF di folder <code>public/cv</code> dengan nama:
-                </p>
-                <code className="mt-2 block break-all text-xs text-slate-900">
-                  {CV_FILE_NAMES.join(" atau ")}
-                </code>
-              </div>
-            </div>
-          ) : cvAvailable === null ? (
-            <div className="grid h-full min-h-[14rem] place-items-center p-6 text-center text-sm text-slate-600">
-              Memeriksa file CV…
-            </div>
-          ) : (
-            <iframe
-              src={`${resolvedCvUrl}#toolbar=0&navpanes=0&view=FitH`}
-              title="CV preview"
-              className="size-full border-0"
-            />
-          )}
+        <div className="cv-preview-frame">
+          <iframe
+            src={`${profile.cvUrl}#toolbar=0&navpanes=0&view=FitH`}
+            title="CV preview"
+            className="size-full border-0"
+          />
         </div>
 
         <div className="cv-modal-footer">
@@ -1004,7 +919,7 @@ function CvPreviewModal({ open, onClose }: { open: boolean; onClose: () => void 
             <p className="font-mono text-[0.6rem] tracking-[0.16em] text-[var(--muted)]">CV FILE</p>
             <p className="mt-1 text-sm text-[var(--muted)]">Lihat ringkasan pengalaman dan keahlian.</p>
             <a
-              href={resolvedCvUrl}
+              href={profile.cvUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={`${focusRing} mt-2 inline-flex text-xs font-semibold text-[var(--accent)] hover:underline`}
@@ -1013,8 +928,8 @@ function CvPreviewModal({ open, onClose }: { open: boolean; onClose: () => void 
             </a>
           </div>
           <a
-            href={resolvedCvUrl}
-            download={resolvedCvUrl.split("/").pop() ?? CV_FILE_NAME}
+            href={profile.cvUrl}
+            download={CV_FILE_NAME}
             className={`${focusRing} group inline-flex min-h-11 items-center justify-center gap-3 bg-[var(--accent)] px-5 text-sm font-semibold text-[var(--accent-contrast)]`}
           >
             Download CV
@@ -1029,19 +944,15 @@ function CvPreviewModal({ open, onClose }: { open: boolean; onClose: () => void 
   );
 }
 
-function isVideoSource(screenshot: Screenshot) {
-  return screenshot.mediaType === "video" || /\.(mp4|webm|ogg)(?:$|[?#])/i.test(screenshot.src);
-}
-
 function ProjectPreviewImage({ project }: { project: Project }) {
-  const [mediaFailed, setMediaFailed] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const screenshot = project.screenshots[0];
 
-  if (!screenshot || mediaFailed) {
+  if (!screenshot || imageFailed) {
     return (
       <div className="project-preview-image grid aspect-[16/10] place-items-center border border-dashed border-[var(--line)] bg-[var(--surface)] p-5 text-center">
         <p className="max-w-xs text-sm leading-6 text-[var(--muted)]">
-          Tambahkan media pertama project di:
+          Tambahkan foto pertama project di:
           <br />
           <code className="break-all text-xs text-[var(--accent)]">
             public{screenshot?.src ?? `/images/projects/${project.slug}/01.png`}
@@ -1054,31 +965,15 @@ function ProjectPreviewImage({ project }: { project: Project }) {
   return (
     <figure className="project-preview-image overflow-hidden border border-[var(--line)] bg-[var(--surface)]">
       <div className="relative aspect-[16/10] w-full">
-        {isVideoSource(screenshot) ? (
-          <video
-            src={screenshot.src}
-            poster={screenshot.poster}
-            aria-label={screenshot.alt}
-            autoPlay
-            controls
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            className="size-full bg-black object-contain"
-            onError={() => setMediaFailed(true)}
-          />
-        ) : (
-          <Image
-            src={screenshot.src}
-            alt={screenshot.alt}
-            fill
-            sizes="(max-width: 1023px) 100vw, 42vw"
-            loading="lazy"
-            className="object-contain p-2 sm:p-3"
-            onError={() => setMediaFailed(true)}
-          />
-        )}
+        <Image
+          src={screenshot.src}
+          alt={screenshot.alt}
+          fill
+          sizes="(max-width: 1023px) 100vw, 42vw"
+          loading="lazy"
+          className="object-contain p-2 sm:p-3"
+          onError={() => setImageFailed(true)}
+        />
       </div>
       {screenshot.caption && (
         <figcaption className="border-t border-[var(--line)] px-3 py-2 text-xs text-[var(--muted)] sm:px-4 sm:py-3 sm:text-sm">
@@ -1136,7 +1031,7 @@ function ProjectVisual({ project }: { project: Project }) {
           <span className="project-status-dot" aria-hidden="true" />
           PROJECT PREVIEW
         </span>
-        <span>MEDIA 01</span>
+        <span>IMAGE 01</span>
       </div>
       <div className="mt-4">
         <ProjectPreviewImage project={project} />
@@ -1285,6 +1180,17 @@ export default function PortfolioPage() {
     let exitTimeout = 0;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    try {
+      if (window.sessionStorage.getItem(INTRO_STORAGE_KEY) === "1") {
+        setIntroProgress(100);
+        setIntroReady(true);
+        setIntroVisible(false);
+        return;
+      }
+    } catch {
+      // The intro still runs when session storage is unavailable.
+    }
+
     const duration = reducedMotion ? 320 : 1900;
     const startedAt = performance.now();
 
@@ -1298,6 +1204,11 @@ export default function PortfolioPage() {
       }
 
       holdTimeout = window.setTimeout(() => {
+        try {
+          window.sessionStorage.setItem(INTRO_STORAGE_KEY, "1");
+        } catch {
+          // The intro can still finish without session storage.
+        }
         setIntroReady(true);
         setIntroExiting(true);
         exitTimeout = window.setTimeout(
@@ -3244,7 +3155,7 @@ export default function PortfolioPage() {
                   <span className="flex items-center gap-2"><Activity className="size-3 text-[var(--accent)]" aria-hidden="true" /> PROFILE</span>
                   <span>02 / 02</span>
                 </div>
-                <div className="relative mb-8 w-full">
+                <div className="relative mb-8 min-h-[20rem] w-full flex-1 overflow-hidden">
                   <ProfileCarousel screenshots={profile.images} title={profile.name} />
                 </div>
                 <p className="font-mono text-xs tracking-[0.13em] text-[var(--muted)]">
@@ -3254,7 +3165,7 @@ export default function PortfolioPage() {
                   {[
                     ["Focus", "Web & Mobile Development"],
                     ["Core", "Laravel / Flutter"],
-
+                    ["Integration", "REST API"],
                     ["Location", "Magetan, East Java"],
                   ].map(([term, description]) => (
                     <div
@@ -3275,6 +3186,7 @@ export default function PortfolioPage() {
               <SectionHeading
                 number="01"
                 eyebrow="About"
+                title="A software developer grounded in engineering and collaboration."
               />
 
               <div className="mt-14 grid gap-12 lg:grid-cols-[9rem_minmax(0,1.35fr)_minmax(17rem,0.65fr)] lg:gap-10">
@@ -3323,6 +3235,7 @@ export default function PortfolioPage() {
               <SectionHeading
                 number="02"
                 eyebrow="Skills"
+                title="A practical toolkit for building and maintaining software systems."
               />
 
               <div className="mt-14 grid border-t border-[var(--line)] sm:grid-cols-2 lg:grid-cols-5">
@@ -3356,7 +3269,8 @@ export default function PortfolioPage() {
             <div className="mx-auto max-w-[88rem] px-5 sm:px-8 lg:px-12">
               <SectionHeading
                 number="03"
-                eyebrow="Projects"
+                eyebrow="Selected work"
+                title="Four systems shaped around real operational needs."
               />
 
               <div className="mt-14 grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)] lg:gap-16">
@@ -3429,6 +3343,7 @@ export default function PortfolioPage() {
               <SectionHeading
                 number="04"
                 eyebrow="Experience"
+                title="Development work across web, mobile, APIs, and applied data methods."
               />
               <div className="mt-14 border-b border-[var(--line)]">
                 {experiences.map((experience, index) => (
@@ -3442,15 +3357,14 @@ export default function PortfolioPage() {
 
           <section id="contact" className="scroll-mt-24 border-t border-[var(--line)] py-24 sm:py-32 lg:py-40">
             <div className="mx-auto max-w-[88rem] px-5 sm:px-8 lg:px-12">
-              <SectionHeading
-                number="05"
-                eyebrow="Contact"
-              />
-
-              <div className="mt-14 grid gap-12 lg:grid-cols-[9rem_1fr] lg:gap-10">
-                <div className="contact-copy lg:col-start-2">
-                  <p className="max-w-2xl text-lg leading-8 opacity-70">
-                    <TextReveal text="For a role, a project, or a conversation about web and mobile systems, reach me directly by email." />
+              <div className="grid gap-12 lg:grid-cols-[9rem_1fr] lg:gap-10">
+                <p className="font-mono text-xs tracking-[0.14em] opacity-60">05 / CONTACT</p>
+                <div className="contact-copy">
+                  <h2 className="max-w-5xl text-balance text-4xl font-medium leading-[1.04] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
+                    <TextReveal text="Open to software development opportunities and thoughtful collaborations." />
+                  </h2>
+                  <p className="mt-7 max-w-2xl text-lg leading-8 opacity-70">
+                    <TextReveal text="For a role, a project, or a conversation about web and mobile systems, reach me directly by email or WhatsApp." />
                   </p>
 
                   <div className="mt-10 flex flex-wrap gap-3">
@@ -3460,6 +3374,18 @@ export default function PortfolioPage() {
                     >
                       <Mail aria-hidden="true" className="size-4" />
                       Send email
+                      <ArrowUpRight
+                        aria-hidden="true"
+                        className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </a>
+                    <a
+                      href={profile.whatsappUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${focusRing} group inline-flex min-h-12 items-center gap-3 border border-current px-5 text-sm font-semibold focus-visible:ring-offset-[var(--bg)]`}
+                    >
+                      WhatsApp
                       <ArrowUpRight
                         aria-hidden="true"
                         className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -3493,7 +3419,7 @@ export default function PortfolioPage() {
                     </button>
                   </div>
 
-                  <address className="mt-16 grid gap-6 border-t border-current/20 pt-7 not-italic sm:grid-cols-2">
+                  <address className="mt-16 grid gap-6 border-t border-current/20 pt-7 not-italic sm:grid-cols-3">
                     <a
                       href={`mailto:${profile.email}`}
                       className={`${focusRing} group flex items-start gap-3 text-sm leading-6 opacity-70 transition-opacity hover:opacity-100`}
@@ -3502,6 +3428,16 @@ export default function PortfolioPage() {
                       <span>
                         <span className="block font-mono text-xs opacity-70">EMAIL</span>
                         <span className="mt-1 block break-all">{profile.email}</span>
+                      </span>
+                    </a>
+                    <a
+                      href={`tel:${profile.phoneInternational}`}
+                      className={`${focusRing} flex items-start gap-3 text-sm leading-6 opacity-70 transition-opacity hover:opacity-100`}
+                    >
+                      <Phone aria-hidden="true" className="mt-1 size-4 shrink-0" />
+                      <span>
+                        <span className="block font-mono text-xs opacity-70">PHONE</span>
+                        <span className="mt-1 block">{profile.phone}</span>
                       </span>
                     </a>
                     <div className="flex items-start gap-3 text-sm leading-6 opacity-70">

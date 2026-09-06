@@ -1,8 +1,49 @@
 @import "tailwindcss";
 
+/* Use the .dark class placed on <html> by the portfolio theme switcher. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7f5;
+  --foreground: #18181b;
+
+  /* Aliases used by the portfolio component. */
+  --bg: var(--background);
+  --fg: var(--foreground);
+  --muted: #71717a;
+  --line: #e4e4e7;
+  --surface: #efefec;
+  --accent: #5865b8;
+  --accent-2: var(--accent);
+  --accent-contrast: #ffffff;
+  --grid: rgba(24, 24, 27, 0.055);
+  --pointer-glow: rgba(88, 101, 184, 0.07);
+  --soft-glow: rgba(88, 101, 184, 0.045);
+  --scrollbar-track: #ecece8;
+  --scrollbar-thumb: #d0d0ca;
+  --scrollbar-thumb-hover: #b2b2aa;
+  color-scheme: light;
+}
+
+:root.dark {
+  --background: #111214;
+  --foreground: #f4f1ea;
+
+  --bg: var(--background);
+  --fg: var(--foreground);
+  --muted: #a1a1aa;
+  --line: #2a2b2f;
+  --surface: #1a1b1f;
+  --accent: #8d8be8;
+  --accent-2: var(--accent);
+  --accent-contrast: #111214;
+  --grid: rgba(244, 241, 234, 0.055);
+  --pointer-glow: rgba(141, 139, 232, 0.1);
+  --soft-glow: rgba(141, 139, 232, 0.06);
+  --scrollbar-track: #1a1b1f;
+  --scrollbar-thumb: #3a3b43;
+  --scrollbar-thumb-hover: #5a5b66;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -12,15 +53,102 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  background: var(--background);
+  color: var(--foreground);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 body {
-  background: var(--background);
+  min-height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(circle at 88% 0%, var(--soft-glow), transparent 30rem),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+::selection {
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+
+.technical-grid {
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Restrained reveal motion for headings and content groups. */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 700ms ease,
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Keep the theme switch smooth across the page, including CONTACT. */
+html.theme-transition,
+html.theme-transition * {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow !important;
+  transition-duration: 450ms !important;
+}
+
+/* Scrollbar follows the active theme instead of staying white. */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal,
+  .reveal-visible {
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
 }
